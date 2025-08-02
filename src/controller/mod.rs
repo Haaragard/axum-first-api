@@ -33,6 +33,6 @@ mod test {
 
         let result = TestController::call().await;
         
-        assert_eq!(result.status(), hyper::StatusCode::OK);
+        assert_eq!(result.status(), axum::http::StatusCode::OK);
     }
 }

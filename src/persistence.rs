@@ -9,7 +9,7 @@ impl SqliteRepository {
 
     pub fn create_user(&self, input: CreateUserInputDTO) -> Result<CreateUserOutputDTO, Error> {
         let user = User::new(
-            Some("id-123-456-789".into()),
+            Some(guid_create::GUID::rand().to_string()),
             input.name,
         );
         if user.id.is_none() {

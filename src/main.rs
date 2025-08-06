@@ -1,11 +1,17 @@
-mod http;
-mod controller;
+mod error;
+
+mod route;
+mod app_state;
+
+mod persistence;
+
+mod handler;
+mod entity;
 
 #[tokio::main]
 async fn main() {
     // build our application with a single route
-    let mut router: axum::Router = http::routes::create_router();
-    router = http::routes::register_routes(router);
+    let router: axum::Router = route::create_router();
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080").await.unwrap();

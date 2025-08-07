@@ -11,12 +11,10 @@ pub enum Error {
     ConnectionLockError,
 
     #[from]
-    #[warn(dead_code)]
     RusqliteError(rusqlite::Error),
 
     // -- Externals
     #[from]
-    #[warn(dead_code)]
     Io(std::io::Error),
 }
 

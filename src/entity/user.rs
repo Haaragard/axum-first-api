@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: Option<String>,
     pub name: String,

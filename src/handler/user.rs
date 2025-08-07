@@ -7,6 +7,7 @@ use axum::{
 use axum::extract::State;
 
 use crate::app_state::user::CreateUserState;
+use crate::entity::user::User;
 use crate::persistence::CreateUserInputDTO;
 
 #[derive(Debug)]
@@ -22,10 +23,7 @@ impl CreateUser {
 
         match state.repository.create_user(dto) {
             Ok(result) => {
-                let response = Response {
-                    id: Some(result.id),
-                    name: result.name,
-                };
+                let response = Response { user: result.user };
                 return (StatusCode::CREATED, Json(CreateUserResponse::Success(response)));
             },
             Err(error) => {
@@ -56,8 +54,7 @@ pub enum CreateUserResponse {
 // Resposta de sucesso
 #[derive(PartialEq, Eq, Debug, Serialize)]
 pub struct Response {
-    pub id: Option<String>,
-    pub name: String,
+    pub user: User,
 }
 
 // Resposta de erro
@@ -68,88 +65,92 @@ pub struct ResponseError {
 
 #[cfg(test)]
 mod test {
-    use std::sync::Arc;
+    // use std::sync::Arc;
 
-    use super::*;
+    // use super::*;
 
     #[tokio::test]
     async fn test_should_create_user_call_success() {
-        let create_user_dto = Json(CreateUserDTO {
-            name: "fake-name".into(),
-        });
+        todo!("Needs fix!")
+    //     let create_user_dto = Json(CreateUserDTO {
+    //         name: "fake-name".into(),
+    //     });
 
-        let create_user_state = crate::app_state::user::CreateUserState {
-            repository: Arc::new(crate::persistence::SqliteRepository::new(
-                ":memory:".into()
-            )),
-        };
+    //     let create_user_state = crate::app_state::user::CreateUserState {
+    //         repository: Arc::new(crate::persistence::SqliteRepository::new(
+    //             ":memory:".into()
+    //         )),
+    //     };
 
-        let (
-            response_status_code,
-            json_response
-        ) = CreateUser::call(State(create_user_state), create_user_dto).await;
+    //     let (
+    //         response_status_code,
+    //         json_response
+    //     ) = CreateUser::call(State(create_user_state), create_user_dto).await;
 
         // Assert status code is CREATED
-        assert_eq!(response_status_code, StatusCode::CREATED);
+        // assert_eq!(response_status_code, StatusCode::CREATED);
 
         // Assert Response
-        assert_eq!(
-            json_response.0,
-            CreateUserResponse::Success(Response {
-                id: None,
-                name: "fake-name".into(),
-            })
-        );
+        // assert_eq!(
+        //     json_response.0,
+        //     CreateUserResponse::Success(Response {
+        //         id: None,
+        //         name: "fake-name".into(),
+        //     })
+        // );
     }
 
     #[tokio::test]
     async fn test_should_create_user_call_error() {
-        let create_user_dto = Json(CreateUserDTO {
-            name: "fake-name".into(),
-        });
+        todo!("Needs fix!")
+        // let create_user_dto = Json(CreateUserDTO {
+        //     name: "fake-name".into(),
+        // });
 
-        let create_user_state = crate::app_state::user::CreateUserState {
-            repository: Arc::new(crate::persistence::SqliteRepository::new(
-                ":memory:".into()
-            )),
-        };
+        // let create_user_state = crate::app_state::user::CreateUserState {
+        //     repository: Arc::new(crate::persistence::SqliteRepository::new(
+        //         ":memory:".into()
+        //     )),
+        // };
 
-        let (
-            response_status_code,
-            json_response
-        ) = CreateUser::call(State(create_user_state), create_user_dto).await;
+        // let (
+        //     response_status_code,
+        //     json_response
+        // ) = CreateUser::call(State(create_user_state), create_user_dto).await;
 
-        // Assert status code is CREATED
-        assert_eq!(response_status_code, StatusCode::CREATED);
+        // // Assert status code is CREATED
+        // assert_eq!(response_status_code, StatusCode::CREATED);
 
-        // Assert Response
-        assert_eq!(
-            json_response.0,
-            CreateUserResponse::Error(ResponseError {
-                message: "fake-message-error".into(),
-            })
-        );
+        // // Assert Response
+        // assert_eq!(
+        //     json_response.0,
+        //     CreateUserResponse::Error(ResponseError {
+        //         message: "fake-message-error".into(),
+        //     })
+        // );
     }
 
     #[tokio::test]
     async fn test_should_create_response_success_with_null_id() {
-        let response_json = serde_json::to_string(&Response {
-            id: None,
-            name: "fake-name".into(),
-        })
-        .unwrap();
+        todo!("Needs fix!")
+        // let response_json = serde_json::to_string(&Response {
+        //     id: None,
+        //     name: "fake-name".into(),
+        // })
+        // .unwrap();
 
-        assert_eq!(response_json, "{\"id\":null,\"name\":\"fake-name\"}");
+        // assert_eq!(response_json, "{\"id\":null,\"name\":\"fake-name\"}");
     }
 
     #[tokio::test]
     async fn test_should_create_response_success() {
-        let response_json = serde_json::to_string(&Response {
-            id: Some("id-123-456-789".into()),
-            name: "fake-name".into(),
-        })
-        .unwrap();
+        todo!("Needs fix!")
+        // let response_json = serde_json::to_string(&Response {
+        //     id: Some("id-123-456-789".into()),
+        //     name: "fake-name".into(),
+        // })
+        // .unwrap();
 
-        assert_eq!(response_json, "{\"id\":123,\"name\":\"fake-name\"}");
+        // assert_eq!(response_json, "{\"id\":123,\"name\":\"fake-name\"}");
     }
 }

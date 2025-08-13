@@ -5,6 +5,11 @@ use rusqlite::Connection;
 
 use crate::{entity::user::User, error::{Error, Result}};
 
+pub trait UserRepository: Debug + Send + Sync {
+    fn create_table(&self) -> Result<(), Error>;
+    fn create_user(&self, input: CreateUserInputDTO) -> Result<CreateUserOutputDTO, Error>;
+}
+
 #[derive(Clone, Debug)]
 pub struct SqliteRepository {
     conn: Arc<Mutex<Connection>>,
@@ -23,8 +28,9 @@ impl SqliteRepository {
 
         Ok(instance)
     }
-
-    pub fn create_table(&self) -> Result<(), Error> {
+}
+impl UserRepository for SqliteRepository {
+    fn create_table(&self) -> Result<(), Error> {
         if let Ok(conn) = self.conn.lock() {
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS users (
@@ -41,7 +47,7 @@ impl SqliteRepository {
         Err(Error::ConnectionLockError)
     }
 
-    pub fn create_user(&self, input: CreateUserInputDTO) -> Result<CreateUserOutputDTO, Error> {
+    fn create_user(&self, input: CreateUserInputDTO) -> Result<CreateUserOutputDTO, Error> {
         let user_guid = guid_create::GUID::rand().to_string();
         let created_at = Utc::now().to_rfc3339();
 
@@ -59,6 +65,33 @@ impl SqliteRepository {
             }),
             _ => Err(Error::UserCreateCouldNotCreateUser)
         }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct MysqlRepository {
+    conn: String,
+}
+impl MysqlRepository {
+    pub fn new(
+        _path: String,
+        _user: String,
+        _password: String
+    ) -> Result<Self, Error> {
+        Ok(MysqlRepository { conn: "Test".to_string() })
+    }
+}
+impl UserRepository for MysqlRepository {
+    fn create_table(&self) -> Result<(), Error> {
+        Ok(())
+    }
+    fn create_user(&self, _input: CreateUserInputDTO) -> Result<CreateUserOutputDTO, Error> {
+        Ok(CreateUserOutputDTO {
+            user: User {
+                id: None,
+                name: "test".to_string(),
+            }
+        })
     }
 }
 

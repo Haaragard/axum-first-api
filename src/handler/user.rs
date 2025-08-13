@@ -21,7 +21,7 @@ impl CreateUser {
             name: payload.name.clone(),
         };
 
-        match state.repository.create_user(dto) {
+        match state.user_repository.create_user(dto) {
             Ok(result) => {
                 let response = Response { user: result.user };
                 return (StatusCode::CREATED, Json(CreateUserResponse::Success(response)));

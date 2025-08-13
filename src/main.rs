@@ -2,6 +2,8 @@ use std::{env, sync::Arc};
 
 use dotenv::dotenv;
 
+use crate::persistence::{MysqlRepository, UserRepository, SqliteRepository};
+
 mod error;
 mod app_state;
 mod persistence;
@@ -29,19 +31,41 @@ pub fn create_router() -> axum::Router<()> {
     let base_routes = axum::Router::new()
         .route("/", axum::routing::get(|| async { "Hello, Axum" }))
         .route("/healthcheck", axum::routing::get(handler::healthcheck::HealthCheck::call));
-
-    let user_repository = Arc::new(
-        crate::persistence::SqliteRepository::new(
-            std::env::var("DATABASE_URL")
-                .unwrap_or(":memory:".to_string())
-        )
-            .expect("Could not connect into database")
-    );
     let user_routes = axum::Router::new()
         .route("/user", axum::routing::post(handler::user::CreateUser::call))
         .with_state(app_state::user::CreateUserState {
-            repository: Arc::clone(&user_repository)
+            user_repository: resolve_user_repository()
+                .expect("Resolve user repository error.")
         });
 
     base_routes.merge(user_routes)
+}
+
+fn resolve_user_repository() -> Result<Arc<dyn UserRepository>, error::Error> {
+    let database_type = std::env::var("DATABASE_TYPE")
+        .unwrap_or("sqlite".to_string());
+    let database_url = std::env::var("DATABASE_URL")
+            .unwrap_or(":memory:".to_string());
+
+    match database_type.as_str() {
+        "sqlite" => {
+            let repository = SqliteRepository::new(database_url)
+                .expect("SQLite database connection error");
+            Ok(Arc::new(repository) as Arc<dyn UserRepository>)
+        },
+        "mysql" => {
+            let database_user = std::env::var("DATABASE_USER")
+                .unwrap_or("".to_string());
+            let database_password = std::env::var("DATABASE_PASSWORD")
+                .unwrap_or("".to_string());
+            let repository = MysqlRepository::new(
+                database_url,
+                database_user,
+                database_password
+            )
+                .expect("MYSQL database connection error");
+            Ok(Arc::new(repository) as Arc<dyn UserRepository>)
+        },
+        _ => Err(error::Error::from("Unexpected database type".to_string())),
+    }
 }
